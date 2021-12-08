@@ -190,6 +190,8 @@
                  $teks = str_replace("?", " ", $teks);
  
                  $teks = str_replace("rt", " ", $teks);
+
+                 $teks = filter_var($teks, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
                  
                  $string = trim(preg_replace('/\s\s+/', ' ', $teks));
                  $json_decoded = json_decode($string);
@@ -297,6 +299,7 @@
                         $teks = str_replace("!", " ", $teks);
                         $teks = str_replace("?", " ", $teks);
                         $teks = str_replace("rt", " ", $teks);
+                        $teks = filter_var($teks, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
                         $string = trim(preg_replace('/\s\s+/', ' ', $teks));
 
                         $json_decoded = json_decode($string);
