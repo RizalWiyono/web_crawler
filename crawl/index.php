@@ -22,7 +22,6 @@
             ]);
 
             var options = {
-                title: 'My Daily Activities',
                 is3D: true,
             };
 
@@ -96,6 +95,7 @@
 
             <div id="piechart_3d" style="width: 900px; height: 500px;"></div>
             <?php 
+            error_reporting(0);
              $curl = curl_init();
 
              $query = $_GET['search'];    
@@ -306,7 +306,6 @@
                         array_push($array_data, $string);
                         array_push($array_text, $string);
 
-                        // Formula Overlap
                         if($_GET['metode'] == "Overlap"){
                             $resultDQ = 0.0;
                             $resultD = 0.0;
@@ -323,9 +322,7 @@
                             $resultD = $resultD;
                             $resultQ = $resultQ;
                             $result = $resultDQ/min($resultD, $resultQ);
-                        }
-                        // Formula Asymmetric
-                        elseif($_GET['metode'] == "Asymmetric"){
+                        } elseif($_GET['metode'] == "Asymmetric"){
                             $resultDQ = 0;
                             $resultQ = 0;
                             
@@ -338,122 +335,122 @@
                             $resultDQ = $resultDQ;
                             $resultQ = $resultQ;
                             $result = round($resultDQ/$resultQ,1);
-                        }
-                        // Formula Cosine
-                        elseif($_GET['metode'] == "Cosine"){
+                        }  elseif($_GET['metode'] == "Cosine"){
                             $resultDQ = 0;
                             $resultD = 0;
                             $resultQ = 0;
                             
                             for($i = 0; $i < $countData-1; $i++)
                             {
-                                $resultDQ += ($array[$y][$i] * $array[$countAllData-1][$i]);
+                                $resultDQ += $array[$countAllData-1][$i] * $array[$y][$i];
                                 $resultD += pow($array[$y][$i], 2);
-                                $resultQ += pow($array[$countAllData-1][$i],2);
+                                $resultQ += pow($array[$countAllData-1][$i], 2);
                             }
 
                             $resultDQ = $resultDQ;
-                            $resultD = sqrt($resultD);
-                            $resultQ =  sqrt($resultQ);
-                            $result = round($resultDQ/($resultD*$resultQ),1);
+                            $resultD = $resultD;
+                            $resultQ =  $resultQ;
 
-                            
-                        } ?>
-                        <tr>
-                            <th scope="row"><?=$y;?></th>
-                            <td><?=$user[0]?></td>
-                            <td><?=$item["id"]?></td>
-                            <td><?=$item["text"]?></td>
-                            <td><?=$teks?></td>
-                            
-                            <?php if($result >= 1){ ?>
-                                <td class="text-success text-bold">1</td>
-                            <?php }elseif($result < 1 || $result >= 0.5){ ?>
-                                <td class="text-danger text-bold">0.5</td>
-                            <?php }else{ ?>
-                                <td class="text-bold">0</td>
-                            <?php }
+                            $result = round($resultDQ/($resultQ+$resultD-$resultDQ),1);
+                        } 
 
-                            if($result >= 1){ 
-                                $positif += 1; ?>
-                                <td class="text-success text-bold">Positif</td>
-                            <?php }elseif($result < 1 || $result >= 0.5){ 
-                                $negatif += 1; ?>
-                                <td class="text-danger text-bold">Negatif</td>
-                            <?php }else{ 
-                                $netral += 1; ?>
-                                <td class="text-bold">Netral</td>
-                            <?php } ?>
-                        </tr>
+                        include 'src/connection/connection.php';
+
+                        $resultDQO = 0;
+                        $resultDO = 0;
+                        $resultQO = 0;
+                        for($i = 0; $i < $countData-1; $i++)
+                        {
+                            $resultDQO += ($array[10][$i]*$array[$y][$i]);
+                            $resultDO += pow($array[$y][$i], 2);
+                            $resultQO += pow($array[10][$i], 2);
+                        }
+
+                        $resultDQO = $resultDQO;
+                        $resultDO = $resultDO;
+                        $resultQO = $resultQO;
+                        $resultO = round($resultDQO/min($resultDO, $resultQO),1);
+
+                        $resultDQJ = 0;
+                        $resultDJ = 0;
+                        $resultQJ = 0;
                         
-                    <?php 
+                        for($i = 0; $i < $countData-1; $i++)
+                        {
+                            $resultDQJ += $array[$y][$i] * $array[10][$i];
+                            $resultDJ += pow($array[$y][$i], 2);
+                            $resultQJ += pow($array[10][$i],2);
+                        }
 
-                    include 'src/connection/connection.php';
+                        $resultDQJ = $resultDQJ;
+                        $resultDJ = $resultDJ;
+                        $resultQJ =  $resultQJ;
+                        $resultJ = round($resultDQJ/($resultQJ+$resultDJ-$resultDQJ),1);
 
-                    // Overlap
-                    $resultDQO = 0;
-                    $resultDO = 0;
-                    $resultQO = 0;
-                    for($i = 0; $i < $countData-1; $i++)
-                    {
-                    $resultDQO += ($array[10][$i]*$array[$y][$i]);
-                    $resultDO += pow($array[$y][$i], 2);
-                    $resultQO += pow($array[10][$i], 2);
-                    }
+                        $resultDQA = 0;
+                        $resultQA = 0;
+                        
+                        for($i = 0; $i < $countData-1; $i++)
+                        {
+                            $resultDQA += min($array[10][$i], $array[$y][$i]);
+                            $resultQA += pow($array[10][$i], 2);
+                        }
 
-                    $resultDQO = $resultDQO;
-                    $resultDO = $resultDO;
-                    $resultQO = $resultQO;
-                    $resultO = round($resultDQO/min($resultDO, $resultQO),1);
+                        $resultDQA = $resultDQA;
+                        $resultQA = $resultQA;
+                        $resultA = round($resultDQA/$resultQA,1);
 
-                    // Asymmetric
-                    $resultDQA = 0;
-                    $resultQA = 0;
+                        if(is_nan($resultO) || is_infinite($resultO) || is_nan($resultJ) || is_infinite($resultJ) || is_nan($resultA) || is_infinite($resultA)){
+                            $paramData += 1;
+                            if($paramData == $y){
+                                echo "<h1 style='text-align: center;'>Insert new keyword, this is keyword is not defined</h1>";
+                            }
+                        }else{ 
+                            $paramId = $item["id"];
+
+                            // Input to Database
+                            $query = "INSERT INTO tb_tweets (id_tweets, id_username, username, tweets, overlap, asymmetric, jaccard) 
+                            values 
+                            (null, '$paramId', '','$teks','$resultO', '$resultA', '$resultJ')";
+                            mysqli_query($connect, $query); ?>
+                            <tr>
+                                <th scope="row"><?=$y;?></th>
+                                <td><?=$user[0]?></td>
+                                <td><?=$item["id"]?></td>
+                                <td><?=$item["text"]?></td>
+                                <td><?=$teks?></td>
+                                
+                                <?php if($result >= 1){ ?>
+                                    <td class="text-success text-bold">1</td>
+                                <?php }elseif($result < 1 || $result >= 0.5){ ?>
+                                    <td class="text-danger text-bold">0.5</td>
+                                <?php }else{ ?>
+                                    <td class="text-bold">0</td>
+                                <?php }
+
+                                if($result >= 1){ 
+                                    $sPos += 1; ?>
+                                    <td class="text-success text-bold">Positif</td>
+                                <?php }elseif($result < 1 || $result >= 0.5){ 
+                                    $sNeg += 1; ?>
+                                    <td class="text-danger text-bold">Negatif</td>
+                                <?php }else{ 
+                                    $sNet += 1; ?>
+                                    <td class="text-bold">Netral</td>
+                                <?php } ?>
+                            </tr>
+                        <?php 
+
                     
-                    for($i = 0; $i < $countData-1; $i++)
-                    {
-                    $resultDQA += (min($array[10][$i], $array[$y][$i]));
-                    $resultQA += $array[10][$i];
-                    }
-
-                    $resultDQA = $resultDQA;
-                    $resultQA = $resultQA;
-                    $resultA = round($resultDQA/$resultQA,1);
-
-                    // Cosine
-                    $resultDQC = 0;
-                    $resultDC = 0;
-                    $resultQC = 0;
-                    
-                    for($i = 0; $i < $countData-1; $i++)
-                    {
-                    $resultDQC += ($array[$y][$i] * $array[10][$i]);
-                    $resultDC += pow($array[$y][$i], 2);
-                    $resultQC += pow($array[10][$i],2);
-                    }
-
-                    $resultDQC = $resultDQ;
-                    $resultDC = sqrt($resultD);
-                    $resultQC =  sqrt($resultQ);
-                    $resultC = round($resultDQ/($resultD*$resultQ),1);
-
-                    $ids = $item["id"];
-
-                    // Input to Database
-                    $query = "INSERT INTO tb_tweets (id_tweets, id_username, username, tweets, overlap, asymmetric, cosine) 
-                    values 
-                    (null, '$ids', '','$teks','$resultO', '$resultA', '$resultC')";
-                    mysqli_query($connect, $query);
                     $y++;
-                    } ?>
+                    } }?>
                     
                         </tbody>
                     </table>
-                    
-                    <!-- Parameter value use Pie Chart -->
-                    <input type="hidden" value="<?=$positif?>" id="positif">
-                    <input type="hidden" value="<?=$negatif?>" id="negatif">
-                    <input type="hidden" value="<?=$netral?>" id="netral">
+
+                    <input type="hidden" value="<?=$sPos?>" id="positif">
+                    <input type="hidden" value="<?=$sNeg?>" id="negatif">
+                    <input type="hidden" value="<?=$sNet?>" id="netral">
                 </div>
             </div>
 

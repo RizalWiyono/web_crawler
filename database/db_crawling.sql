@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 25, 2021 at 08:22 PM
+-- Generation Time: Dec 12, 2021 at 05:39 AM
 -- Server version: 10.4.18-MariaDB
 -- PHP Version: 7.4.16
 
@@ -34,7 +34,7 @@ CREATE TABLE `tb_tweets` (
   `tweets` varchar(100) NOT NULL,
   `overlap` varchar(20) NOT NULL,
   `asymmetric` varchar(20) NOT NULL,
-  `cosine` varchar(20) NOT NULL
+  `jaccard` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
