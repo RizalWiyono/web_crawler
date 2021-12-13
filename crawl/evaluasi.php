@@ -202,7 +202,7 @@
                                     include 'src/connection/connection.php'; 
                                     $query_data  = mysqli_query($connect, "SELECT * FROM tb_tweets");
                                     while($row = mysqli_fetch_array($query_data)){ 
-                                    // array_push($array, ["uye" => $row["tweets"], "value" => $row["overlap"]]);
+                                    // array_push($array, ["uye" => $row["tweets"], "value" => $row["asymmetric"]]);
                                     array_push($arrayAsymmetric, $row["tweets"]); 
                                     array_push($arrayTargetAsymmetric, $row["asymmetric"]);
                                     array_push($arrayStringAsymmetric, $row["tweets"],); ?>
@@ -328,35 +328,35 @@
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $arrayJaccrad = [];
-                                    $arrayTargetJaccrad = [];
-                                    $arrayStringJaccrad = [];
+                                    $arrayCosine = [];
+                                    $arrayTargetCosine = [];
+                                    $arrayStringCosine = [];
                                     $no=0;
                                     include 'src/connection/connection.php'; 
                                     $query_data  = mysqli_query($connect, "SELECT * FROM tb_tweets");
                                     while($row = mysqli_fetch_array($query_data)){ 
-                                    // array_push($array, ["uye" => $row["tweets"], "value" => $row["overlap"]]);
-                                    array_push($arrayJaccrad, $row["tweets"]); 
-                                    array_push($arrayTargetJaccrad, $row["jaccard"]);
-                                    array_push($arrayStringJaccrad, $row["tweets"],); ?>
+                                    // array_push($array, ["uye" => $row["tweets"], "value" => $row["cosine"]]);
+                                    array_push($arrayCosine, $row["tweets"]); 
+                                    array_push($arrayTargetCosine, $row["cosine"]);
+                                    array_push($arrayStringCosine, $row["tweets"],); ?>
                                     
                                     <?php $no++; } 
                                     require_once __DIR__ . '/vendor/autoload.php';
 
-                                    $tf->fit($arrayJaccrad);
-                                    $tf->transform($arrayJaccrad);
+                                    $tf->fit($arrayCosine);
+                                    $tf->transform($arrayCosine);
                                     $vocabulary = $tf->getVocabulary();
 
-                                    $count = count($arrayJaccrad);
+                                    $count = count($arrayCosine);
 
                                     $dataset = new ArrayDataset(
-                                        $samples = $arrayJaccrad,
-                                        $targets = $arrayTargetJaccrad
+                                        $samples = $arrayCosine,
+                                        $targets = $arrayTargetCosine
                                     );
 
                                     $datasets = new ArrayDataset(
-                                        $samples = $arrayStringJaccrad,
-                                        $targets = $arrayTargetJaccrad
+                                        $samples = $arrayStringCosine,
+                                        $targets = $arrayTargetCosine
                                     );
 
                                     $dataset = new StratifiedRandomSplit($dataset, 0.2, 1234);
@@ -366,7 +366,7 @@
                                     $xTestData = $dataset->getTestSamples();
                                     $yTestData = $dataset->getTestLabels();
 
-                                    function label_encode_jaccard($xData){
+                                    function label_encode_cosine($xData){
                                         $xDataProcessed = [];
                                         $colNum = count($xData[0]);
                                         for($i = 0;$i < $colNum;$i++){
@@ -381,8 +381,8 @@
                                         }
                                         return $xDataProcessed;
                                     }
-                                    $xTrainEncoded = label_encode_jaccard($xTrainData);
-                                    $xTestEncoded = label_encode_jaccard($xTestData);
+                                    $xTrainEncoded = label_encode_cosine($xTrainData);
+                                    $xTestEncoded = label_encode_cosine($xTestData);
 
                                     
                                     $model = new DecisionTree();
@@ -429,19 +429,19 @@
                                         //     $value = "Netral";
                                         // }
 
-                                        // if($rows["Jaccrad"] >= 1){
+                                        // if($rows["cosine"] >= 1){
                                         //     $param = "Positif";
-                                        // }elseif($rows["Jaccrad"] < 1 || $rows["Jaccrad"] >= 0.5){
+                                        // }elseif($rows["cosine"] < 1 || $rows["cosine"] >= 0.5){
                                         //     $param = "Negatif";
                                         // }else{
                                         //     $param = "Netral";
                                         // }
                                         ?> 
                                         <td><?=$value?></td>
-                                        <td><?=$rows["jaccard"]?></td>
+                                        <td><?=$rows["cosine"]?></td>
                                         <?php
-                                        if($param_tweets == $rows["jaccard"]){ 
-                                            $accuration_jaccard += 1;
+                                        if($param_tweets == $rows["cosine"]){ 
+                                            $accuration_cosine += 1;
                                             ?>
                                             <td>V</td>
                                         <?php }else{ ?>
@@ -452,9 +452,9 @@
                                 </tbody>
                             </table>
                             <h5>Jumlah Data Testing: <?=count($newDatas[1])?></h5>
-                            <h5>Jumlah Data Valid: <?=$accuration_jaccard?></h5>
-                            <h5>Jumlah Data Tidak Valid: <?=count($newDatas[1])-$accuration_jaccard?></h5>
-                            <h5>Akurasi: <?=$accuration_jaccard/count($newDatas[1])*100?>%</h5>
+                            <h5>Jumlah Data Valid: <?=$accuration_cosine?></h5>
+                            <h5>Jumlah Data Tidak Valid: <?=count($newDatas[1])-$accuration_cosine?></h5>
+                            <h5>Akurasi: <?=$accuration_cosine/count($newDatas[1])*100?>%</h5>
                             <hr>
                         </div>
                     </div>
