@@ -409,7 +409,7 @@
                             $paramId = $item["id"];
 
                             // Input to Database
-                            $query = "INSERT INTO tb_tweets (id_tweets, id_username, username, tweets, overlap, asymmetric, jaccard) 
+                            $query = "INSERT INTO tb_tweets (id_tweets, id_username, username, tweets, overlap, asymmetric, cosine) 
                             values 
                             (null, '$paramId', '','$teks','$resultO', '$resultA', '$resultJ')";
                             mysqli_query($connect, $query); ?>
